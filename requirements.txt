@@ -1,0 +1,7 @@
+streamlit
+openai
+replicate
+pylint 
+autopep8
+ipython
+moviepy
