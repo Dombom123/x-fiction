@@ -103,7 +103,10 @@ def get_video_from_Replicate_API(image_path, video_length="25_frames_with_svd_xt
         input={"input_image": open(image_path, "rb"), "video_length": video_length}
     )
     # download the video from the URL
-    download.download_video_from_url(url, f"media/clips/video_{image_path[7:-4]}.mp4")
+    file_path = f"media/clips/video_img_{image_path[17:-4]}.mp4"
+    download.download_video_from_url(url, file_path)
+    
+    return file_path
 
 def combine_videos_and_audio(video_paths, audio_path, output_path):
     """
@@ -136,43 +139,36 @@ def combine_videos_and_audio(video_paths, audio_path, output_path):
 
     return output_path
 
-# Example usage
+
 def main():
-    story_prompt = "Funny Scene from a Sitcom about the Devil's Job as a Lawyer"
+    story_prompt = "Reactions from hell (Genre: Satire)"
     story_json = generate_story(story_prompt)
     print(story_json)
     story_json_dict = json.loads(story_json)
-    # Extract title
+
     title = story_json_dict["title"]
-    # Extract voiceover text
     voiceover_text = story_json_dict["voiceover_text"]
     speech = generate_voiceover(voiceover_text)
     video_paths = []    
 
-    # Extract image prompts from each clip
-    prompts = []
-    visual_style = story_json_dict["visual_style"]
+    visual_style = story_json_dict.get("visual_style", "")
     if "clips" in story_json_dict:
-        for clip_value in story_json_dict["clips"].items():
-            if "image_prompt" in clip_value:
-                prompts.append(f'{clip_value["image_prompt"]} + {visual_style}')
-                
-                
+        for i, (clip_key, clip_value) in enumerate(story_json_dict["clips"].items()):
+            image_prompt = clip_value.get("image_prompt", "")
+            if image_prompt:
+                full_prompt = f'{image_prompt} + {visual_style}'
+                print(f"Generating image number {i} for prompt: {full_prompt}")
+                img_path = get_image_from_DALL_E_3_API(full_prompt)
+                print(f"Generating video number {i}")
+                video_path = get_video_from_Replicate_API(img_path)
+                video_paths.append(video_path)
 
-    # Now 'prompts' contains all the image prompts
-    for i, prompt in prompts:
-        print(f"Generating image number {i} for prompt: {prompt}")
-        img_path = get_image_from_DALL_E_3_API(prompt)
-        print(f"Generating video number {i}")
-        get_video_from_Replicate_API(img_path)
-        video_paths.append(f"media/clips/video_img_{i}.mp4")
-        i += 1
-    # Combine all the videos and speech into one
-    output_video_path = f"media/videos/{title}.mp4"
-    combine_videos_and_audio(video_paths, speech, output_video_path)
-
-    print(f"Combined video and audio saved to {output_video_path}")
-            
+    if video_paths:
+        output_video_path = f"media/videos/{title}.mp4"
+        combine_videos_and_audio(video_paths, speech, output_video_path)
+        print(f"Combined video and audio saved to {output_video_path}")
+    else:
+        print("No videos were generated.")
 
 if __name__ == "__main__":
     main()
