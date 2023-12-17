@@ -9,4 +9,6 @@ media/clips/*
 media/images/*
 media/videos/*
 media/voiceover/*
+.DS_Store
+
 
