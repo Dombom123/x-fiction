@@ -53,5 +53,4 @@ This project is released under the [MIT License].
 
 For inquiries or collaboration, reach out via:
 
-
 - **Email**: \[Your Email]
