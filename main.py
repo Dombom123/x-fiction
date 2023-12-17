@@ -9,6 +9,7 @@ import replicate
 from moviepy.editor import VideoFileClip, concatenate_videoclips, AudioFileClip
 import utils.download_from_url as download
 from pathlib import Path
+import streamlit as st
 # Load environment variables from .env file
 load_dotenv()
 client = OpenAI(
@@ -140,8 +141,7 @@ def combine_videos_and_audio(video_paths, audio_path, output_path):
     return output_path
 
 
-def main():
-    story_prompt = "Reactions from hell (Genre: Satire)"
+def generate_video(story_prompt):
     story_json = generate_story(story_prompt)
     print(story_json)
     story_json_dict = json.loads(story_json)
@@ -169,6 +169,12 @@ def main():
         print(f"Combined video and audio saved to {output_video_path}")
     else:
         print("No videos were generated.")
+
+
+def main():
+    story_prompt = "Reactions from hell (Genre: Satire)"
+    generate_video(story_prompt)
+    st.title("Story Generator")
 
 if __name__ == "__main__":
     main()

@@ -11,4 +11,6 @@ media/videos/*
 media/voiceover/*
 .DS_Store
 
+# streamlit
+.streamlit/secrets.toml
 
