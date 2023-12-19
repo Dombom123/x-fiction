@@ -154,7 +154,7 @@ def generate_video_from_audio(audio_url):
             "pad_audio": "0.0",
             "stitch": True
         },
-        "source_url": "https://i.ibb.co/b6S8DYJ/Bildschirmfoto-2023-11-17-um-10-22-22-removebg-preview.png"
+        "source_url": "https://i.ibb.co/bszCKKS/7.png"
     }
     authorization = st.secrets["authorization"]
     headers = {

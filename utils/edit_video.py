@@ -45,9 +45,9 @@ def edit_video():
     
 
 def main():
-    gen_path = 'data/gen.mp4'
-    original_video_path = 'data/original.mp4'
-    audio_path = 'data/audio.mp3'
+    gen_path = 'media/react/gen.mp4'
+    original_video_path = 'media/react/original.mp4'
+    audio_path = 'media/react/audio.mp3'
     assemble_video(gen_path, original_video_path, audio_path)
     print('Done')
 
