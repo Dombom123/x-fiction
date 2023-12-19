@@ -104,13 +104,14 @@ def generate_voiceover(voiceover_text):
     path_str = str(speech_file_path)
     return path_str
 
-def get_image_from_DALL_E_3_API(user_prompt, image_dimension="1024x1024", image_quality="standard", model="dall-e-3", nb_final_image=1):
+def get_image_from_DALL_E_3_API(user_prompt, image_dimension="1024x1024", image_quality="standard", model="dall-e-3", nb_final_image=1, style="vivid"):
     response = client.images.generate(
         model=model,
         prompt=user_prompt,
         size=image_dimension,
         quality=image_quality,
         n=nb_final_image,
+        style=style,
     )
 
     image_url = response.data[0].url
