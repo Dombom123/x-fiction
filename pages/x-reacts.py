@@ -29,7 +29,7 @@ def read_frames_from_video(path_to_video):
     return base64Frames
 
 def generate_transcript(path_to_video):
-    api_key = st.secrets["secrets"]["OPENAI_API_KEY"]
+    api_key = st.secrets["OPENAI_API_KEY"]
     client = OpenAI(api_key=api_key)
     # Get the audio from the video
     audio = AudioFileClip(path_to_video)
@@ -49,7 +49,7 @@ def generate_transcript(path_to_video):
     return text_content
 
 def generate_text_from_video(path_to_video):
-    api_key = st.secrets["secrets"]["OPENAI_API_KEY"]
+    api_key = st.secrets["OPENAI_API_KEY"]
     client = OpenAI(api_key=api_key)
     base64Frames = read_frames_from_video(path_to_video)
     transcript = generate_transcript(path_to_video)
@@ -81,7 +81,7 @@ def generate_text_from_video(path_to_video):
     return result.choices[0].message.content
 
 def generate_voiceover_from_text(prompt, text):
-    api_key = st.secrets["secrets"]["OPENAI_API_KEY"]
+    api_key = st.secrets["OPENAI_API_KEY"]
     client = OpenAI(api_key=api_key)
 
     PROMPT_MESSAGES = [
@@ -106,7 +106,7 @@ def generate_voiceover_from_text(prompt, text):
 
 
 def generate_audio_from_text(text):
-    api_key = st.secrets["secrets"]["OPENAI_API_KEY"]
+    api_key = st.secrets["OPENAI_API_KEY"]
     response = requests.post(
         "https://api.openai.com/v1/audio/speech",
         headers={
@@ -156,7 +156,7 @@ def generate_video_from_audio(audio_url):
         },
         "source_url": "https://i.ibb.co/b6S8DYJ/Bildschirmfoto-2023-11-17-um-10-22-22-removebg-preview.png"
     }
-    authorization = st.secrets["secrets"]["authorization"]
+    authorization = st.secrets["authorization"]
     headers = {
         "accept": "application/json",
         "content-type": "application/json",
@@ -198,7 +198,7 @@ def generate_video_from_audio(audio_url):
 def upload_audio_to_did(audio_path):
 
     url = "https://api.d-id.com/audios"
-    authorization = st.secrets["secrets"]["authorization"]
+    authorization = st.secrets["authorization"]
 
     files = { "audio": (audio_path, open(audio_path, "rb"), "audio/mpeg") }
     headers = {

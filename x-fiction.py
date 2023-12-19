@@ -16,7 +16,7 @@ import streamlit as st
 load_dotenv()
 client = OpenAI(
         # This is the default and can be omitted
-        api_key=os.environ.get("OPENAI_API_KEY"),
+        api_key=st.secrets["OPENAI_API_KEY"],
     )
 
 def generate_example_prompt():
