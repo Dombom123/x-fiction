@@ -237,7 +237,7 @@ def generate_video(story_prompt):
         with open(f"media/reports/{title}.json", 'w') as outfile:
             json.dump(report, outfile)
 
-        return title, output_video_path, outfile
+        return output_video_path
 
     else:
         print("No videos were generated.")
@@ -316,14 +316,12 @@ def main():
                     col3.write(prompt_value)
     if col1.button("Start Generation (0,80€)"):
         with st.spinner("Generating video..."):
-            title, video_path, outfile = generate_video(story_prompt)
-            col1, col2, col3 = st.columns(3)
+            video_path = generate_video(story_prompt)
+            col1, col2 = st.columns(3)
             col1.success("Video generated!")
-            # if col2.button("Download Report"):
-            #     st.download_button(label="Download Report", data=outfile, file_name=f"Report_{title}.json")
-            # if col2.button("Download Video"):
-            #     st.download_button(label="Download Video", data=video_path)
-            col3.video(video_path)   
+
+
+            col2.video(video_path)   
 
     with st.expander("Example Gallery"):
         col1, col2, col3 = st.columns(3)
