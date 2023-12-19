@@ -5,3 +5,4 @@ pylint
 autopep8
 ipython
 moviepy
+opencv-python-headless
