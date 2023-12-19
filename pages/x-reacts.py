@@ -154,7 +154,7 @@ def generate_video_from_audio(audio_url):
             "pad_audio": "0.0",
             "stitch": True
         },
-        "source_url": "https://i.ibb.co/bszCKKS/7.png"
+        "source_url": "https://i.ibb.co/cDX4gn3/11.png"
     }
     authorization = st.secrets["authorization"]
     headers = {
