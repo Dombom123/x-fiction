@@ -92,7 +92,7 @@ def generate_voiceover(voiceover_text):
     Generate a voiceover from text using the OpenAI API.
     """
 
-    speech_file_path = Path(__file__).parent / f"media/voiceover/speech{voiceover_text[:25]}.mp3"
+    speech_file_path = Path(__file__).parent / f"media/voiceover/speech_{voiceover_text[:25]}.mp3"
     response = client.audio.speech.create(
     model="tts-1-hd",
     voice="onyx",
