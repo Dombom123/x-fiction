@@ -121,6 +121,7 @@ def get_image_from_DALL_E_3_API(user_prompt, image_dimension="1024x1024", image_
         # Open the image and save it to a file
         image = Image.open(BytesIO(response.content))
         file_path = f"media/images/img_{user_prompt[:50]}.png"  # Limiting prompt length to avoid too long file names
+        os.makedirs("media/images", exist_ok=True)
         image.save(file_path)
         return file_path
 
@@ -140,6 +141,7 @@ def get_video_from_Replicate_API(image_path, video_length="25_frames_with_svd_xt
     )
     # download the video from the URL
     file_path = f"media/clips/clip_{image_path[17:-4]}.mp4"
+    os.makedirs("media/clips", exist_ok=True)
     download.download_video_from_url(url, file_path)
     
     return file_path
@@ -163,6 +165,8 @@ def combine_videos_and_audio(video_paths, audio_path, output_path):
 
     # Set the audio of the concatenated clip as the audio clip
     final_clip = final_clip.set_audio(audio_clip)
+
+    os.makedirs("media/videos", exist_ok=True)
 
     # Write the result to the output file
     final_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
