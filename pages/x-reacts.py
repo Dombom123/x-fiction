@@ -167,9 +167,9 @@ def generate_video_from_audio(audio_url):
     # if no id is returned, then the credits are used up
     if "id" not in response.json():
         st.write(response.json()["kind"])
-        return
+        return None
+    
     video_id = response.json()["id"] # error means no credits left
-
     url = f"https://api.d-id.com/talks/{video_id}"
 
     # Retry the request until the 'result_url' is available
@@ -234,6 +234,9 @@ def process_video_with_text(text, path_to_video, progress_bar):
     progress_bar.progress(50)
 
     gen_video_path = generate_video_from_audio(audio_url)
+    if gen_video_path is None:
+        st.error("An error occurred while generating the video. Please try again later.")
+        return None
     progress_bar.progress(80)
 
     assemble_video(gen_video_path, path_to_video, audio_path)
