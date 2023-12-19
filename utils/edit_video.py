@@ -2,6 +2,7 @@
 from moviepy.editor import VideoFileClip, CompositeVideoClip, AudioFileClip, concatenate_videoclips
 
 import numpy as np
+import os
 
 
 
@@ -35,7 +36,8 @@ def assemble_video(gen_path, original_video_path, audio_path):
     composite_video = composite_video.set_audio(audio)
 
     # Write the final video to a file
-    composite_video.write_videofile('data/final.mp4')
+    os.makedirs('media/react', exist_ok=True)
+    composite_video.write_videofile('media/react/final.mp4')
 
 
 def edit_video():
