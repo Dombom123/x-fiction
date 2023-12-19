@@ -322,7 +322,7 @@ def main():
     if col1.button("Start Generation (0,80€)"):
         with st.spinner("Generating video..."):
             video_path = generate_video(story_prompt)
-            col1, col2 = st.columns(3)
+            col1, col2 = st.columns(2)
             col1.success("Video generated!")
 
 
