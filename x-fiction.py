@@ -91,7 +91,8 @@ def generate_voiceover(voiceover_text):
     """
     Generate a voiceover from text using the OpenAI API.
     """
-
+    # make sure the directory exists
+    os.makedirs("media/voiceover", exist_ok=True)
     speech_file_path = Path(__file__).parent / f"media/voiceover/speech_{voiceover_text[:25]}.mp3"
     response = client.audio.speech.create(
     model="tts-1-hd",
