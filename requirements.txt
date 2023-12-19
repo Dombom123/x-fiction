@@ -7,4 +7,3 @@ ipython
 moviepy
 opencv-python-headless
 python-dotenv
-```
