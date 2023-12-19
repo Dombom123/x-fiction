@@ -166,7 +166,7 @@ def generate_video_from_audio(audio_url):
     response = requests.post(url, json=payload, headers=headers)
     # if no id is returned, then the credits are used up
     if "id" not in response.json():
-        st.write("No credits left. Please try again later.")
+        st.write(response.json()["kind"])
         return
     video_id = response.json()["id"] # error means no credits left
 
