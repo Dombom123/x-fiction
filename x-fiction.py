@@ -272,17 +272,21 @@ def display_generated_media(key, generate_media_function, col_image, col_video, 
             col_video.subheader("Generated Video:")
             col_video.video(media_path)
 
+def list_video_files(directory):
+    """List video files in the given directory."""
+    video_extensions = ['.mp4', '.avi', '.mov']  # Add more extensions as needed
+    return [file for file in os.listdir(directory) if os.path.splitext(file)[1] in video_extensions]
 
-    # # Confirm or regenerate buttons
-    # col1, col2 = st.columns(2)
-    # with col1:
-    #     if st.button(f"Confirm {key}"):
-    #         st.session_state[f'confirmed_{key}'] = True
-    # with col2:
-    #     if st.button(f"Regenerate {key}"):
-    #         st.session_state[f'regenerate_{key}'] = True
-    
-    
+def display_videos(video_files):
+    """Display videos in rows of 3."""
+    with st.expander("Example Gallery"):
+        for i in range(0, len(video_files), 3):
+            cols = st.columns(3)
+            for j in range(3):
+                index = i + j
+                if index < len(video_files):
+                    cols[j].video(os.path.join('media/videos', video_files[index]))
+
 
 
 
@@ -330,15 +334,15 @@ def main():
             col2.video(video_path)   
 
     with st.expander("Example Gallery"):
-        col1, col2, col3 = st.columns(3)
-        col1.video("media/videos/Legal Beagle: The Devil's Advocacy.mp4")
-        col2.video("media/videos/Hell's Advocate.mp4")
-        col3.video("media/videos/Suits & Horns.mp4")
-        col1, col2, col3 = st.columns(3)
-        col1.video("media/videos/Submerged Secrets.mp4")
-        col2.video("media/videos/Neon Noir: Red Planet Mystery.mp4")
-        col3.video("media/videos/Voyage through the Cosmic Veil.mp4")
-    
+        # Directory containing the videos
+        video_directory = 'media/videos'
+
+        # Get a list of video files
+        videos = list_video_files(video_directory)
+
+        # Display videos
+        display_videos(videos)
+        
    
 
 if __name__ == "__main__":
