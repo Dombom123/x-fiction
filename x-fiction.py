@@ -332,16 +332,14 @@ def main():
 
 
             col2.video(video_path)   
+    # Directory containing the videos
+    video_directory = 'media/videos'
 
-    with st.expander("Example Gallery"):
-        # Directory containing the videos
-        video_directory = 'media/videos'
+    # Get a list of video files
+    videos = list_video_files(video_directory)
 
-        # Get a list of video files
-        videos = list_video_files(video_directory)
-
-        # Display videos
-        display_videos(videos)
+    # Display videos
+    display_videos(videos)
         
    
 
