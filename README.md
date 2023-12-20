@@ -1,7 +1,7 @@
 
 # Multimedia Content Generator
 
-[media/images/img_A bright courtroom with a handsome, sharply dresse.png]
+![alt text](https://github.com/dombom123/x-fiction/blob/main/media/header3.png?raw=true)
 
 ## Description
 
@@ -17,7 +17,7 @@ The Multimedia Content Generator is an innovative project leveraging the capabil
 
 ## Installation
 
-1. **Clone the Repository**: `git clone https://github.com/your-username/x-fiction.git`
+1. **Clone the Repository**: `git clone https://github.com/dombom123/x-fiction.git`
 2. **Install Dependencies**: Run `pip install -r requirements.txt` to install the necessary Python packages.
 
 ### Setting Up
@@ -27,9 +27,9 @@ OPENAI_API_KEY=your-api-key-here
 
 ## Usage
 
-Execute the main script with a desired story prompt:
+Start the Streamlit Frontend:
 
-python main.py 'Your story prompt here'
+streamlit run x-fiction.py
 
 The script processes your prompt to generate a story, voiceover, images, and videos, ultimately combining them into a single multimedia file.
 
