@@ -228,21 +228,7 @@ def generate_video(story_prompt):
         output_video_path = f"media/videos/{title}.mp4"
         combine_videos_and_audio(video_paths, speech_path, output_video_path)
         print(f"Combined video and audio saved to {output_video_path}")
-        st.write(f"Combined video and audio saved to {output_video_path}")
-        # generate report with all prompts images and video
-        report = {}
-        report['title'] = title
-        report['video_logline'] = video_logline
-        report['voiceover_text'] = voiceover_text
-        report['visual_style'] = visual_style
-        report['clips'] = []
-        for i, (clip_key, clip_value) in enumerate(story_json_dict["clips"].items()):
-            clip = {}
-            clip['image_prompt'] = clip_value.get("image_prompt", "")
-            report['clips'].append(clip)
-        with open(f"media/reports/{title}.json", 'w') as outfile:
-            json.dump(report, outfile)
-
+        st.write(f"Combined video and audio saved to {output_video_path}")        
         return output_video_path
 
     else:

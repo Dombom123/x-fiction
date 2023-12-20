@@ -1,5 +1,4 @@
 import os
-import httpx
 from io import BytesIO
 from PIL import Image
 from openai import AsyncOpenAI

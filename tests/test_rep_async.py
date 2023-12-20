@@ -10,17 +10,17 @@ load_dotenv()
 
 async def get_video_from_Replicate_API(image_path, video_length="25_frames_with_svd_xt"):
     url = await replicate.async_run(
-        "stability-ai/stable-video-diffusion:3f0457e4619daac51203dedb472816fd4af51f3149fa7a9e0b5ffcf1b8172438",
+        "dombom123/x-reacts",
         input={"input_image": open(image_path, "rb"), "video_length": video_length}
     )
-
+    print(url)
     # Generate a unique output path based on the input image name
     base_name = os.path.basename(image_path)
     output_path = f"media/videos/video_{base_name[:-4]}.mp4"
-    #wait for the video to be generated
-    await asyncio.sleep(100)
+
     async with httpx.AsyncClient() as client:
-        response = await client.get(url, follow_redirects=True)
+        timeout = httpx.Timeout(60.0)  # Set timeout to 10 seconds
+        response = await client.get(url, follow_redirects=True, timeout=timeout)
         if response.status_code == 200:
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
             with open(output_path, "wb") as video_file:
@@ -35,9 +35,9 @@ async def main_async():
     start_time = asyncio.get_event_loop().time()
 
     image_paths = [
-        "media/images/img_A diverse crew of spacefarers is intently focused .png",
-        "media/images/img_A diverse crew of spacefarers is intently focused .png",
-        "media/images/img_A diverse crew of spacefarers is intently focused .png",
+        "media/images/img_An elaborately dressed demon with sharp attire and.png",
+        "media/images/img_An elaborately dressed demon with sharp attire and.png",
+        # "media/images/img_An elaborately dressed demon with sharp attire and.png",
     ]
 
     tasks = [get_video_from_Replicate_API(image_path) for image_path in image_paths]

@@ -30,7 +30,7 @@ def get_video_from_Replicate_API(image_path, video_length="25_frames_with_svd_xt
 
 
 def main():
-    image_path = "images/img_A diverse crew of spacefarers is intently focused .png"
+    image_path = "media/images/img_An elaborately dressed demon with sharp attire and.png"
     video_path = get_video_from_Replicate_API(image_path)
     print(video_path)
 
