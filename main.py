@@ -10,11 +10,13 @@ from moviepy.editor import VideoFileClip, concatenate_videoclips, AudioFileClip
 import utils.download_from_url as download
 from pathlib import Path
 import streamlit as st
+
+
 # Load environment variables from .env file
 load_dotenv()
 client = OpenAI(
         # This is the default and can be omitted
-        api_key=os.environ.get("OPENAI_API_KEY"),
+        api_key=st.secrets["OPENAI_API_KEY"],
     )
 
 def generate_example_prompt():
@@ -40,6 +42,8 @@ def generate_example_prompt():
                 }
             ],
             response_format={ "type": "json_object" },
+            temperature=1.0,
+
         )
         
         return response.choices[0].message.content
@@ -88,8 +92,9 @@ def generate_voiceover(voiceover_text):
     """
     Generate a voiceover from text using the OpenAI API.
     """
-
-    speech_file_path = Path(__file__).parent / f"media/voiceover/speech{voiceover_text[:25]}.mp3"
+    # make sure the directory exists
+    os.makedirs("media/voiceover", exist_ok=True)
+    speech_file_path = Path(__file__).parent / f"media/voiceover/speech_{voiceover_text[:25]}.mp3"
     response = client.audio.speech.create(
     model="tts-1-hd",
     voice="onyx",
@@ -100,13 +105,14 @@ def generate_voiceover(voiceover_text):
     path_str = str(speech_file_path)
     return path_str
 
-def get_image_from_DALL_E_3_API(user_prompt, image_dimension="1792x1024", image_quality="hd", model="dall-e-3", nb_final_image=1):
+def get_image_from_DALL_E_3_API(user_prompt, image_dimension="1024x1024", image_quality="standard", model="dall-e-3", nb_final_image=1, style="vivid"):
     response = client.images.generate(
         model=model,
         prompt=user_prompt,
         size=image_dimension,
         quality=image_quality,
         n=nb_final_image,
+        style=style,
     )
 
     image_url = response.data[0].url
@@ -117,6 +123,7 @@ def get_image_from_DALL_E_3_API(user_prompt, image_dimension="1792x1024", image_
         # Open the image and save it to a file
         image = Image.open(BytesIO(response.content))
         file_path = f"media/images/img_{user_prompt[:50]}.png"  # Limiting prompt length to avoid too long file names
+        os.makedirs("media/images", exist_ok=True)
         image.save(file_path)
         return file_path
 
@@ -135,7 +142,8 @@ def get_video_from_Replicate_API(image_path, video_length="25_frames_with_svd_xt
         input={"input_image": open(image_path, "rb"), "video_length": video_length}
     )
     # download the video from the URL
-    file_path = f"media/clips/video_img_{image_path[17:-4]}.mp4"
+    file_path = f"media/clips/clip_{image_path[17:-4]}.mp4"
+    os.makedirs("media/clips", exist_ok=True)
     download.download_video_from_url(url, file_path)
     
     return file_path
@@ -160,6 +168,8 @@ def combine_videos_and_audio(video_paths, audio_path, output_path):
     # Set the audio of the concatenated clip as the audio clip
     final_clip = final_clip.set_audio(audio_clip)
 
+    os.makedirs("media/videos", exist_ok=True)
+
     # Write the result to the output file
     final_clip.write_videofile(output_path, codec='libx264', audio_codec='aac')
 
@@ -171,89 +181,154 @@ def combine_videos_and_audio(video_paths, audio_path, output_path):
 
     return output_path
 
-
 def generate_video(story_prompt):
     story_json = generate_story(story_prompt)
     print(story_json)
-    st.write(story_json)
     story_json_dict = json.loads(story_json)
 
     title = story_json_dict["title"]
-    st.write(title)
+    st.header(title)
+    col1, col2, col3 = st.columns(3)
+    video_logline = story_json_dict.get("video_logline", "")
+    col1.subheader("Video Logline")
+    col1.write(video_logline)
     voiceover_text = story_json_dict["voiceover_text"]
-    st.write(voiceover_text)
-    speech = generate_voiceover(voiceover_text)
-    video_paths = []    
-
+    col2.subheader("Voiceover Text")
+    col2.write(voiceover_text)
     visual_style = story_json_dict.get("visual_style", "")
-    st.write(visual_style)
+    col3.subheader("Visual Style")
+    col3.write(visual_style)
+
+    speech_path = generate_voiceover(voiceover_text)
+    display_generated_media('voiceover', lambda *args, **kwargs: speech_path, col2, col3)
+    
+    video_paths = []    
+    
     if "clips" in story_json_dict:
         for i, (clip_key, clip_value) in enumerate(story_json_dict["clips"].items()):
             image_prompt = clip_value.get("image_prompt", "")
             if image_prompt:
+                # Generate and confirm each image and video
+                st.subheader(f"Clip {i+1}")
+                col1, col2, col3 = st.columns(3)
                 full_prompt = f'{image_prompt} + {visual_style}'
-                print(f"Generating image number {i} for prompt: {full_prompt}")
-                st.write(f"Generating image number {i} for prompt: {full_prompt}")  
+                col1.subheader("Prompt:")
+                col1.write(f"{full_prompt}")
                 img_path = get_image_from_DALL_E_3_API(full_prompt)
-                print(f"Generating video number {i}")
-                st.write(f"Generating video number {i}")
+       
+                display_generated_media(f'image_{i}', lambda *args, **kwargs: img_path, col2, col3)
+   
+    
                 video_path = get_video_from_Replicate_API(img_path)
+                display_generated_media(f'video_{i}', lambda *args, **kwargs: video_path, col2, col3)
                 video_paths.append(video_path)
+
+    st.subheader("Final Video")
 
     if video_paths:
         output_video_path = f"media/videos/{title}.mp4"
-        combine_videos_and_audio(video_paths, speech, output_video_path)
+        combine_videos_and_audio(video_paths, speech_path, output_video_path)
         print(f"Combined video and audio saved to {output_video_path}")
-        st.write(f"Combined video and audio saved to {output_video_path}")
+        st.write(f"Combined video and audio saved to {output_video_path}")        
         return output_video_path
 
     else:
         print("No videos were generated.")
         st.write("No videos were generated.")
 
+
+
+def display_generated_media(key, generate_media_function, col_image, col_video, *args, **kwargs):
+    # Generate media if not already done or if regeneration is requested
+    if key not in st.session_state or st.session_state.get(f'regenerate_{key}', False):
+        st.session_state[key] = generate_media_function(*args, **kwargs)
+        st.session_state[f'regenerate_{key}'] = False
+
+    media_path = st.session_state[key]
+
+    # Display the generated media based on its file type
+    if media_path:
+        file_extension = os.path.splitext(media_path)[1].lower()
+        if file_extension in ['.jpg', '.jpeg', '.png']:
+            col_image.subheader("Generated Image:")
+            col_image.image(media_path)
+        elif file_extension == '.mp3':
+            st.subheader("Generated Audio:")
+            st.audio(media_path)
+        elif file_extension == '.mp4':
+            col_video.subheader("Generated Video:")
+            col_video.video(media_path)
+
+def list_video_files(directory):
+    """List video files in the given directory."""
+    video_extensions = ['.mp4', '.avi', '.mov']  # Add more extensions as needed
+    return [file for file in os.listdir(directory) if os.path.splitext(file)[1] in video_extensions]
+
+def display_videos(video_files):
+    """Display videos in rows of 3."""
+    with st.expander("Example Gallery"):
+        for i in range(0, len(video_files), 3):
+            cols = st.columns(3)
+            for j in range(3):
+                index = i + j
+                if index < len(video_files):
+                    cols[j].video(os.path.join('media/videos', video_files[index]))
+
+
+
+
 def main():
     st.set_page_config(page_title="X-Fiction", page_icon="🎥")
     st.title("X-Fiction Video Generation 🎥")
-    st.write("This is a demo of the X-Fiction video generation tool. Enter a story prompt and click the 'Start Generation' button to generate a video. Generation may take up to 10 minutes")
+    
+    st.image("media/header3.png")
+    
+    st.write("This is a demo. Enter a story prompt and click the 'Start Generation' button to generate a video. Generations take about 12 minutes. Progress can be followed live. Powered by Stable Video Diffusion.")
     
     # Initialize or use existing session state
     if 'current_story_prompt' not in st.session_state:
         st.session_state['current_story_prompt'] = "Reactions from hell (Genre: Satire)"    
 
-    if st.toggle("Show Example Video", False):
-        st.header("Example Video")
-        st.write("Used Prompt: Reactions from hell (Genre: Satire)")
-        st.video("media/videos/Legal Beagle: The Devil's Advocacy.mp4")
-
-    # Default story prompt
     
+    # Default story prompt
     story_prompt = st.text_input("Enter a story prompt", st.session_state['current_story_prompt'])
 
-    
-    if st.button("Generate Example Prompt"):
+    col1, col2, col3 = st.columns(3)
+
+    if col3.button("Generate Example Prompt"):
         example_prompts_json = generate_example_prompt()
         if example_prompts_json:
             example_prompts = json.loads(example_prompts_json)
+            col1, col2, col3 = st.columns(3)
             for i, (prompt_key, prompt_value) in enumerate(example_prompts.items()):
-                if st.button(prompt_value, key=f'prompt_{i}'):
-                    st.session_state['selected_prompt'] = prompt_value
-
-    # Check outside the loop
-    if 'selected_prompt' in st.session_state and st.session_state['selected_prompt']:
-        with st.spinner("Generating video..."):
-            current_story_prompt = st.session_state['selected_prompt']
-            st.write(f"Starting with prompt: {current_story_prompt}")
-            video_path = generate_video(current_story_prompt)
-            st.success("Video generated!")
-            st.video(video_path)
-            st.session_state['selected_prompt'] = None  # Reset after processing
-
-
-    if st.button("Start Generation"):
+                
+                if i == 0:
+                    col1.subheader("Prompt 1")
+                    col1.write(prompt_value)
+                elif i == 1:
+                    col2.subheader("Prompt 2")
+                    col2.write(prompt_value)
+                elif i == 2:
+                    col3.subheader("Prompt 3")
+                    col3.write(prompt_value)
+    if col1.button("Start Generation (0,80€)"):
         with st.spinner("Generating video..."):
             video_path = generate_video(story_prompt)
-            st.success("Video generated!")
-            st.video(video_path)
+            col1, col2 = st.columns(2)
+            col1.success("Video generated!")
+
+
+            col2.video(video_path)   
+    # Directory containing the videos
+    video_directory = 'media/videos'
+
+    # Get a list of video files
+    videos = list_video_files(video_directory)
+
+    # Display videos
+    display_videos(videos)
+        
+   
 
 if __name__ == "__main__":
     main()
