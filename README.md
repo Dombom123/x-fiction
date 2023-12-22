@@ -22,14 +22,13 @@ The Multimedia Content Generator is an innovative project leveraging the capabil
 
 ### Setting Up
 
-- **Configure OpenAI API Key**: Create a `.env` file in the project root and add your OpenAI API key:
-OPENAI_API_KEY=your-api-key-here
+- **Configure API Keys**: Create a `.streamlit/secrets.toml` file like the provided example file `.streamlit/secrets.example.toml`
 
 ## Usage
 
 Start the Streamlit Frontend:
 
-streamlit run x-fiction.py
+streamlit run x-main.py
 
 The script processes your prompt to generate a story, voiceover, images, and videos, ultimately combining them into a single multimedia file.
 
@@ -53,4 +52,4 @@ This project is released under the [MIT License].
 
 For inquiries or collaboration, reach out via:
 
-- **Email**: \[Your Email]
+- **Email**: dominik@drivebeta.de
