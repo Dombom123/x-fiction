@@ -8,5 +8,7 @@ moviepy
 opencv-python-headless
 python-dotenv
 ffmpeg-python
+ffmpeg
+
 
 
