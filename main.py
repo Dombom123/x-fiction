@@ -10,6 +10,7 @@ from moviepy.editor import VideoFileClip, concatenate_videoclips, AudioFileClip
 import utils.download_from_url as download
 from pathlib import Path
 import streamlit as st
+import image_downloader as ImageDownloader
 
 
 # Load environment variables from .env file
@@ -117,17 +118,11 @@ def get_image_from_DALL_E_3_API(user_prompt, image_dimension="1024x1024", image_
 
     image_url = response.data[0].url
 
-    # Download the image from the URL
-    response = requests.get(image_url)
-    if response.status_code == 200:
-        # Open the image and save it to a file
-        image = Image.open(BytesIO(response.content))
-        file_path = f"media/images/img_{user_prompt[:50]}.png"  # Limiting prompt length to avoid too long file names
-        os.makedirs("media/images", exist_ok=True)
-        image.save(file_path)
-        return file_path
-
-    return None
+    downloader = ImageDownloader("media/images")
+    file_name = f"img_{user_prompt[:50]}"  # Limiting prompt length to avoid too long file names
+    file_path = downloader.download_image(image_url, file_name)
+    
+    return file_path if file_path else None
 
 def get_video_from_Replicate_API(image_path, video_length="25_frames_with_svd_xt"):
     """

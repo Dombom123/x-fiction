@@ -1,0 +1,10 @@
+openai:
+  api_key: YOUR_API_KEY_HERE
+replicate:
+  api_key: YOUR_API_KEY_HERE
+
+system_prompts:
+  story_prompt: "Write a short story about a mysterious island."
+  poem_prompt: "Write a poem about love and loss."
+  dialogue_prompt: "Write a dialogue between two friends."
+  joke_prompt: "Write a joke about a duck."
