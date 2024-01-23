@@ -199,6 +199,7 @@ def generate_video(story_prompt):
     col3.subheader("Visual Style")
     col3.write(visual_style)
     character = story_json_dict.get("character", "")
+    st.subheader("Character")
     st.write(character)
 
     speech_path = generate_voiceover(voiceover_text)
