@@ -198,30 +198,42 @@ def generate_video(story_prompt):
     visual_style = story_json_dict.get("visual_style", "")
     col3.subheader("Visual Style")
     col3.write(visual_style)
+    character = story_json_dict.get("character", "")
+    st.write(character)
 
     speech_path = generate_voiceover(voiceover_text)
     display_generated_media('voiceover', lambda *args, **kwargs: speech_path, col2, col3)
     
     video_paths = []    
     
+    # Assuming story_json_dict is already defined and contains your structured data
+
+
+
     if "clips" in story_json_dict:
         for i, (clip_key, clip_value) in enumerate(story_json_dict["clips"].items()):
             image_prompt = clip_value.get("image_prompt", "")
-            if image_prompt:
-                # Generate and confirm each image and video
-                st.subheader(f"Clip {i+1}")
-                col1, col2, col3 = st.columns(3)
-                full_prompt = f'{image_prompt} + {visual_style}'
-                col1.subheader("Prompt:")
-                col1.write(f"{full_prompt}")
-                img_path = get_image_from_DALL_E_3_API(full_prompt)
-       
-                display_generated_media(f'image_{i}', lambda *args, **kwargs: img_path, col2, col3)
-   
-    
-                video_path = get_video_from_Replicate_API(img_path)
-                display_generated_media(f'video_{i}', lambda *args, **kwargs: video_path, col2, col3)
-                video_paths.append(video_path)
+            character_visible = clip_value.get("character_visible", "False") == "True"
+
+            # Prepend the character description if the character is visible
+            if character_visible and character:
+                image_prompt = f'{character}, {image_prompt}'
+
+            # Append the visual style to the image prompt
+            full_prompt = f'{image_prompt} + {visual_style}'
+
+            # The rest of your code for generating and displaying images and videos
+            st.subheader(f"Clip {i+1}")
+            col1, col2, col3 = st.columns(3)
+            col1.subheader("Prompt:")
+            col1.write(f"{full_prompt}")
+
+            img_path = get_image_from_DALL_E_3_API(full_prompt)
+            display_generated_media(f'image_{i}', lambda *args, **kwargs: img_path, col2, col3)
+            
+            video_path = get_video_from_Replicate_API(img_path)
+            display_generated_media(f'video_{i}', lambda *args, **kwargs: video_path, col2, col3)
+            video_paths.append(video_path)
 
     st.subheader("Final Video")
 
